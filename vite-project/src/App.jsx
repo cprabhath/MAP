@@ -18,11 +18,11 @@ import {
 } from '@react-google-maps/api';
 import { useRef, useState, useEffect } from 'react';
 
-const center = { lat: 48.8584, lng: 2.2945 };
+const center = { lat: 6.927079, lng: 79.861244 };
 
 function App() {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "YOUR_API_KEY",
+    googleMapsApiKey: "AIzaSyApHYUH5MfQaCitqMVVbp58DkPYExV6Iw8",
     libraries: ['places'],
   });
 
@@ -74,19 +74,21 @@ function App() {
       bike: { costPerKilometer: 200, costPerMinute: 200 },
       luxury: { costPerKilometer: 750, costPerMinute: 750 },
     };
-
+  
     const distanceValue = parseFloat(distance.replace(/ km/, '').replace(',', '.'));
     const durationValue = parseFloat(duration.replace(/ mins/, '').replace(',', '.'));
-
+  
     const selectedRate = rates[vehicleType] || rates.standard;
-
+  
     const totalCost = (selectedRate.costPerKilometer * distanceValue) + (selectedRate.costPerMinute * durationValue);
     if (isNaN(totalCost)) {
       return 0;
     }
-
-    return totalCost.toFixed(2);
+  
+    // Format the cost with commas and two decimal places
+    return totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
+  
 
   async function calculateRoute(destination) {
     if (!destination) {
@@ -118,6 +120,20 @@ function App() {
     destiantionRef.current.value = '';
   }
 
+  async function handleBooking() {
+    const bookingData = {
+      currentLocation,
+      currentPlaceName,
+      destination: destiantionRef.current.value,
+      distance,
+      duration,
+      cost,
+      vehicleType,
+    };
+
+    console.log(bookingData);
+  }
+
   return (
     <Box h="100vh" w="100vw" position="relative">
       {/* Full-screen Map */}
@@ -141,6 +157,7 @@ function App() {
 
       {/* Floating Control Panel */}
       <Box position="absolute" top={4} left={4} p={4} bg="white" borderRadius="md" shadow="md" w={600}>
+        <Text fontSize="xl" fontWeight="bold" marginBottom={2} align="center">Book a Ride</Text>
         <HStack spacing={2} justifyContent="space-between">
           <Box flexGrow={1}>
             <Input
@@ -204,7 +221,7 @@ function App() {
           <Text>Duration: {duration} </Text>
         </HStack>
 
-        <Button colorScheme="teal" mt={4} w="100%">
+        <Button colorScheme="teal" mt={4} w="100%" onClick={handleBooking}>
           Book Now
         </Button>
       </Box>
